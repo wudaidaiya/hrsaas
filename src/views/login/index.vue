@@ -29,7 +29,7 @@
         type="primary"
         class="loginBtn"
         style="width: 100%; margin-bottom: 30px"
-        :loading='isLogin'
+        :loading="isLogin"
         @click="login"
         >登录</el-button
       >
@@ -48,7 +48,7 @@ export default {
   data() {
     return {
       loginForm: {
-        mobile: "13800000002",
+        mobile: "13800000001",
         password: "123456",
       },
       loginFormRules: {
@@ -79,8 +79,8 @@ export default {
         // 表单校验
         this.isLogin = true
         await this.$refs.loginForm.validate();
-        // vuex触发actions
-        this.$store.dispatch('user/getToken',this.loginForm)
+        // vuex触发actions  
+        await this.$store.dispatch('user/getToken',this.loginForm)
         // 跳转页面
         this.$router.push('/')
         // 成功提示
