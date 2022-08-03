@@ -7,29 +7,30 @@
     />
 
     <div class="app-breadcrumb">
-      江苏传智播客教育科技股份有限公司
+      {{ $store.state.user.userInfo.companyName }}
       <span class="breadBtn">体验版</span>
     </div>
-<div class="right-menu">
-  <el-dropdown class="avatar-container" trigger="click">
-    <div class="avatar-wrapper">
-      <img
-           src="http://destiny001.gitee.io/image/monkey_02.jpg"
-           class="user-avatar"
-           />
-      <span>用户名</span>
-      <i class="el-icon-caret-bottom" />
+    <div class="right-menu">
+      <el-dropdown class="avatar-container" trigger="click">
+        <div class="avatar-wrapper">
+          <img
+            :src="$store.state.user.userInfo.staffPhoto + 123"
+            class="user-avatar"
+            v-imgError='defaultImg'
+          />
+          <span>{{ $store.state.user.userInfo.username }}</span>
+          <i class="el-icon-caret-bottom" />
+        </div>
+        <el-dropdown-menu slot="dropdown" class="user-dropdown">
+          <router-link to="/">
+            <el-dropdown-item>Home</el-dropdown-item>
+          </router-link>
+          <el-dropdown-item divided @click.native="logout">
+            <span style="display: block">Log Out</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
-    <el-dropdown-menu slot="dropdown" class="user-dropdown">
-      <router-link to="/">
-        <el-dropdown-item>Home</el-dropdown-item>
-      </router-link>
-      <el-dropdown-item divided @click.native="logout">
-        <span style="display: block">Log Out</span>
-      </el-dropdown-item>
-    </el-dropdown-menu>
-  </el-dropdown>
-</div>
   </div>
 </template>
 
@@ -39,6 +40,11 @@ import Breadcrumb from "@/components/Breadcrumb";
 import Hamburger from "@/components/Hamburger";
 
 export default {
+  data () {
+    return {
+      defaultImg:'http://likede2-admin.itheima.net/img/logo.3673fab5.png'
+    }
+  },
   components: {
     Breadcrumb,
     Hamburger,
@@ -115,13 +121,13 @@ export default {
       margin-right: 30px;
 
       .avatar-wrapper {
-         position: relative;
+        position: relative;
         // margin-top: 5px;
         // 开启flex
         display: flex;
         align-items: center;
         color: #fff;
-        span{ 
+        span {
           margin: 0 3px;
         }
         .user-avatar {
@@ -142,23 +148,22 @@ export default {
     }
   }
   .app-breadcrumb {
-  display: inline-block;
-  font-size: 18px;
-  line-height: 50px;
-  margin-left: 10px;
-  color: #ffffff;
-  cursor: text;
-  .breadBtn {
-    background: #84a9fe;
-    font-size: 14px;
-    padding: 0 10px;
     display: inline-block;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 10px;
-    margin-left: 15px;
+    font-size: 18px;
+    line-height: 50px;
+    margin-left: 10px;
+    color: #ffffff;
+    cursor: text;
+    .breadBtn {
+      background: #84a9fe;
+      font-size: 14px;
+      padding: 0 10px;
+      display: inline-block;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 10px;
+      margin-left: 15px;
+    }
   }
 }
-}
-
 </style>
