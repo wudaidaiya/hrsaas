@@ -3,59 +3,117 @@
     <div class="app-container">
       <el-tabs v-model="activeName">
         <el-tab-pane label="用户管理" name="first">
-            <el-button type="primary">新增角色</el-button>
-      <el-table :data="tableData" style="width: 100%">
-          <el-table-column type="index" label="序号">
-        </el-table-column>
-        <el-table-column prop="date" label="角色">
-        </el-table-column>
-        <el-table-column prop="name" label="描述">
-        </el-table-column>
-        <el-table-column prop="address" label="操作"> 
-          <template>
-            <el-button size='small' type="success">分配权限</el-button>
-            <el-button size='small' type="primary">编辑</el-button>
-            <el-button size='small' type="danger">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+          <el-button type="primary" @click="addFn">新增角色</el-button>
+          <!-- 列表 -->
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column type="index" label="序号"> </el-table-column>
+            <el-table-column prop="name" label="角色"> </el-table-column>
+            <el-table-column prop="description" label="描述"> </el-table-column>
+            <el-table-column prop="address" label="操作">
+              <template>
+                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="primary">编辑</el-button>
+                <el-button size="small" type="danger">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <!-- 分页 -->
+          <el-pagination
+            :page-size="pageSize"
+            :page-sizes="[3, 5, 10, 20]"
+            layout="sizes,prev, pager, next"
+            :total="total"
+            @current-change="currentChange"
+            @size-change="handleSizeChange"
+          >
+          </el-pagination>
         </el-tab-pane>
-        <el-tab-pane label="配置管理" name="second">公司信息</el-tab-pane>
+        <el-tab-pane label="公司信息" name="second">公司信息</el-tab-pane>
       </el-tabs>
     </div>
+    <!-- 添加角色对话框 -->
+    <el-dialog @close='dialogClose' title="新增角色" :visible.sync="dialogFormVisible">
+      <el-form
+        :model="addRoleForm"
+        :rules="addRoleFormRules"
+        ref="form"
+        label-width="80px"
+      >
+        <el-form-item label="角色名称" prop='name'>
+          <el-input v-model="addRoleForm.name"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input v-model="addRoleForm.region"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="onClose">取 消</el-button>
+        <el-button @click="onAddRole" type="primary">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import { gerRolesApi,addRoleApi } from "@/api/role.js";
 export default {
   data() {
     return {
       activeName: "first",
-      tableData: [
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1518 弄",
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1517 弄",
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1519 弄",
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          address: "上海市普陀区金沙江路 1516 弄",
-        },
-      ],
+      tableData: [],
+      pageSize: 3,
+      total: 0,
+      page: 1,
+      dialogFormVisible: false,
+      addRoleForm: {
+        name: "",
+        region: "",
+      },
+      addRoleFormRules: {
+        name: [{ required: true, message: '请输入', trigger: 'blur'},],
+      },
     };
   },
-  methods: {},
+  created() {
+    this.getrRoles();
+  },
+  methods: {
+    async getrRoles() {
+      const { rows, total } = await gerRolesApi({
+        page: this.page,
+        pagesize: this.pageSize,
+      });
+      this.tableData = rows;
+      this.total = total;
+    },
+    currentChange(val) {
+      this.page = val;
+      this.getrRoles();
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.getrRoles();
+    },
+    addFn() {
+      this.dialogFormVisible = true;
+    },
+    onClose() {
+      this.dialogFormVisible = false;
+    },
+    // 确定
+    async onAddRole() {
+      await this.$refs.form.validate();
+      await addRoleApi(this.addRoleForm)
+      this.$message.success('添加成功')
+      this.dialogFormVisible = false;
+      this.getrRoles();
+
+    },
+    dialogClose(){
+      this.$refs.form.resetFields()
+      this.addRoleForm.region = ''
+    }
+  },
 };
 </script>
 
