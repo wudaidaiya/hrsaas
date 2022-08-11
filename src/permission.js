@@ -6,13 +6,13 @@ import store from "@/store";
 // from：来自哪个路由的信息
 // next：是否进入
 const whiteList = ["/login", "/404"];
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const token = store.state.user.token;
   if (token) {
     // 如果存在就不再次发送
     if (!store.state.user.userInfo.userId) {
       // 触发vuex 的方法
-      store.dispatch("user/getuserInfo");
+    await store.dispatch("user/getuserInfo");
     }
     // 登录
     // 是否进入登录页
