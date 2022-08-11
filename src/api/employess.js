@@ -9,3 +9,10 @@ export function getEmployeesApi(){
         url:'/sys/user/simple',
     })
 }
+
+export function getEmployeesInfoApi(params){
+    return request({
+        url:'/sys/user',
+        params,
+    })
+}
