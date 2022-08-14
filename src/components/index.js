@@ -1,5 +1,6 @@
 import PageTools from "@/components/PageTools";
-const components = [PageTools];
+import UploadExcel from "@/components/UploadExcel";
+const components = [PageTools,UploadExcel];
 export default {
   install(Vue) {
     // 1.组件名为"conter"; 2.data 写函数; 3.template 写组件的内容(元素和触发的事件)
