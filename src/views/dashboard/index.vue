@@ -1,20 +1,20 @@
 <template>
   <div>
-首页
+    <!-- <UploadImage @onSuccess="onSuccess1"></UploadImage>
+    <UploadImage @onSuccess="onSuccess2"></UploadImage> -->
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {};
+    return {}
   },
 
   created() {},
 
-  methods: {
-  },
-};
+  methods: {}
+}
 </script>
 
 <style scoped></style>

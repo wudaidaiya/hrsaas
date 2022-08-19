@@ -7,7 +7,6 @@
     <div class="main-container">
       <!-- 头部 -->
       <div :class="{'fixed-header':fixedHeader}">
-        <!-- 头部navbar 组件-->
         <navbar />
       </div>
       <!-- 子路由占位 -->

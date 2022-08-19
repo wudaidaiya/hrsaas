@@ -1,10 +1,10 @@
 <template>
-  <div class="sidebar-logo-container" :class="{'collapse':collapse}">
- <transition name="sidebarLogoFade">
-  <router-link key="collapse" class="sidebar-logo-link" to="/">
-    <img src="@/assets/common/logo.png" class="sidebar-logo  ">
-  </router-link>
-</transition>
+  <div class="sidebar-logo-container" :class="{ collapse: collapse }">
+    <transition name="sidebarLogoFade">
+      <router-link key="collapse" class="sidebar-logo-link" to="/">
+        <img src="@/assets/common/logo.png" class="sidebar-logo" />
+      </router-link>
+    </transition>
   </div>
 </template>
 
@@ -48,9 +48,10 @@ export default {
   & .sidebar-logo-link {
     height: 100%;
     width: 100%;
-// 大图样式
-    & .sidebar-logo {
-     width: 140px;
+
+    // 大图样式
+    .sidebar-logo {
+      width: 140px;
       vertical-align: middle;
       margin-right: 12px;
     }
@@ -66,10 +67,11 @@ export default {
       vertical-align: middle;
     }
   }
-// 小图样式
+
+  // 小图样式
   &.collapse {
     .sidebar-logo {
-       margin-right: 0px;
+      margin-right: 0px;
       width: 32px;
       height: 32px;
     }

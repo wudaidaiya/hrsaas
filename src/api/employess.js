@@ -75,3 +75,13 @@ export function updatePersonal(data) {
     data,
   })
 }
+/** *
+ * 给用户分配角色
+ * ***/
+ export function assignRole(data) {
+  return request({
+    url: '/sys/user/assignRoles',
+    data,
+    method: 'put'
+  })
+}

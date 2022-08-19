@@ -5,20 +5,21 @@
       class="hamburger-container"
       @toggleClick="toggleSideBar"
     />
-
     <div class="app-breadcrumb">
       {{ $store.state.user.userInfo.companyName }}
       <span class="breadBtn">体验版</span>
     </div>
+
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img
             :src="$store.state.user.userInfo.staffPhoto"
             class="user-avatar"
-            v-imgError='defaultImg'
+            v-imgError="defaultImg"
           />
-          <span>{{ $store.state.user.userInfo.username }}</span>
+          <!-- 自定义指令 -->
+          <span> {{ $store.state.user.userInfo.username }}</span>
           <i class="el-icon-caret-bottom" />
         </div>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
@@ -35,33 +36,37 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import Breadcrumb from "@/components/Breadcrumb";
-import Hamburger from "@/components/Hamburger";
-
+import { mapGetters } from 'vuex'
+import Breadcrumb from '@/components/Breadcrumb'
+import Hamburger from '@/components/Hamburger'
+// import defaultImg from '@/assets/common/head.jpg'
 export default {
-  data () {
-    return {
-      defaultImg:'http://likede2-admin.itheima.net/img/logo.3673fab5.png'
-    }
-  },
   components: {
     Breadcrumb,
-    Hamburger,
+    Hamburger
   },
   computed: {
-    ...mapGetters(["sidebar", "avatar"]),
+    ...mapGetters(['sidebar', 'avatar'])
   },
+  data() {
+    return {
+      // 引入图片的两种方式
+      defaultImg: 'http://likede2-admin.itheima.net/img/logo.3673fab5.png'
+      //  import defaultImg from '@/assets/common/head.jpg'
+      // defaultImg: defaultImg
+    }
+  },
+
   methods: {
     toggleSideBar() {
-      this.$store.dispatch("app/toggleSideBar");
+      this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await this.$store.dispatch("user/logout");
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
-    },
-  },
-};
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>
@@ -69,8 +74,27 @@ export default {
   height: 50px;
   overflow: hidden;
   position: relative;
-  background-image: -webkit-linear-gradient(left, #3d6df8, #5b8cff);
+  background: #fff;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  background-image: -webkit-linear-gradient(left, #3d6df8, #5b8cff);
+  .app-breadcrumb {
+    display: inline-block;
+    font-size: 18px;
+    line-height: 50px;
+    margin-left: 10px;
+    color: #ffffff;
+    cursor: text;
+    .breadBtn {
+      background: #84a9fe;
+      font-size: 14px;
+      padding: 0 10px;
+      display: inline-block;
+      height: 30px;
+      line-height: 30px;
+      border-radius: 10px;
+      margin-left: 15px;
+    }
+  }
 
   .hamburger-container {
     line-height: 46px;
@@ -79,8 +103,8 @@ export default {
     cursor: pointer;
     transition: background 0.3s;
     -webkit-tap-highlight-color: transparent;
-    color: #ffffff;
-    fill: currentColor;
+    color: #fff;
+    fill: currentColor; //当前颜色填充
     &:hover {
       background: rgba(0, 0, 0, 0.025);
     }
@@ -127,9 +151,7 @@ export default {
         display: flex;
         align-items: center;
         color: #fff;
-        span {
-          margin: 0 3px;
-        }
+
         .user-avatar {
           cursor: pointer;
           width: 40px;
@@ -145,24 +167,6 @@ export default {
           font-size: 12px;
         }
       }
-    }
-  }
-  .app-breadcrumb {
-    display: inline-block;
-    font-size: 18px;
-    line-height: 50px;
-    margin-left: 10px;
-    color: #ffffff;
-    cursor: text;
-    .breadBtn {
-      background: #84a9fe;
-      font-size: 14px;
-      padding: 0 10px;
-      display: inline-block;
-      height: 30px;
-      line-height: 30px;
-      border-radius: 10px;
-      margin-left: 15px;
     }
   }
 }

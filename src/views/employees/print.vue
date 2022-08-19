@@ -1,15 +1,17 @@
 <template>
   <div class="dashboard-container" id="myPrint">
-    <el-button v-print='`#myPrint`'>打印</el-button>
+    <!-- 打印功能：自定义指令，加字符串选择器  main。js引入注册-->
+    <el-button v-print="'#myPrint'">打印</el-button>
     <div class="app-container">
       <el-card>
-        <el-breadcrumb separator="/" class="titInfo ">
+        <el-breadcrumb separator="/" class="titInfo">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item>
-            <router-link :to="{'path':'/employees'}">员工管理</router-link>
+            <router-link :to="{ path: '/employees' }">员工管理</router-link>
           </el-breadcrumb-item>
           <el-breadcrumb-item>打印</el-breadcrumb-item>
         </el-breadcrumb>
+        <!--  -->
         <div v-if="type === 'personal'">
           <h2 class="centInfo">员工信息表</h2>
           <table cellspacing="0" width="100%" class="tableList">
@@ -17,10 +19,14 @@
               <td colspan="8" class="centInfo">基本信息</td>
             </tr>
             <tr>
-              <th style="width:10%">姓名</th>
-              <td colspan="6" style="width:80%">{{ formData.username }}</td>
-              <td rowspan="5" style="width:10%"><img style="width:155px;height:218px" :src="formData.staffPhoto"></td>
-
+              <th style="width: 10%">姓名</th>
+              <td colspan="6" style="width: 80%">{{ formData.username }}</td>
+              <td rowspan="5" style="width: 10%">
+                <img
+                  style="width: 155px; height: 218px"
+                  :src="formData.staffPhoto"
+                />
+              </td>
             </tr>
             <tr>
               <th>性别</th>
@@ -39,10 +45,12 @@
               <td colspan="6">{{ formData.theHighestDegreeOfEducation }}</td>
             </tr>
             <tr>
-              <th style="width:10%">是否可编辑</th>
-              <td style="width:35%">{{ formData.isItEditable }}</td>
-              <th style="width:10%">是否隐藏号码</th>
-              <td colspan="5" style="width:45%">{{ formData.doYouHideNumbers }}</td>
+              <th style="width: 10%">是否可编辑</th>
+              <td style="width: 35%">{{ formData.isItEditable }}</td>
+              <th style="width: 10%">是否隐藏号码</th>
+              <td colspan="5" style="width: 45%">
+                {{ formData.doYouHideNumbers }}
+              </td>
             </tr>
             <tr>
               <th>国家地区</th>
@@ -102,13 +110,17 @@
               <th>子女状态</th>
               <td>{{ formData.stateOfChildren }}</td>
               <th>子女有无商业保险</th>
-              <td colspan="5">{{ formData.doChildrenHaveCommercialInsurance }}</td>
+              <td colspan="5">
+                {{ formData.doChildrenHaveCommercialInsurance }}
+              </td>
             </tr>
             <tr>
               <th>有无违法违纪行为</th>
               <td>{{ formData.isThereAnyViolationOfLawOrDiscipline }}</td>
               <th>有无重大病史</th>
-              <td colspan="5">{{ formData.areThereAnyMajorMedicalHistories }}</td>
+              <td colspan="5">
+                {{ formData.areThereAnyMajorMedicalHistories }}
+              </td>
             </tr>
             <tr class="title">
               <td colspan="8" class="centInfo">通讯信息</td>
@@ -200,7 +212,9 @@
               <th>简历</th>
               <td>{{ formData.resume }}</td>
               <th>有无竞业限制</th>
-              <td colspan="5">{{ formData.isThereAnyCompetitionRestriction }}</td>
+              <td colspan="5">
+                {{ formData.isThereAnyCompetitionRestriction }}
+              </td>
             </tr>
             <tr>
               <th>前公司离职证明</th>
@@ -211,6 +225,7 @@
           </table>
           <div class="foot">签字：___________日期:___________</div>
         </div>
+        <!--  -->
         <div v-else>
           <h2 class="centInfo">岗位信息表</h2>
           <table cellspacing="0" width="100%" class="tableList">
@@ -218,10 +233,10 @@
               <td colspan="4" class="centInfo">基本信息</td>
             </tr>
             <tr>
-              <th style="width:10%">姓名</th>
-              <td style="width:40%">{{ formData.username }}</td>
-              <th style="width:10%">入职日期</th>
-              <td style="width:40%">{{ formData.dateOfEntry }}</td>
+              <th style="width: 10%">姓名</th>
+              <td style="width: 40%">{{ formData.username }}</td>
+              <th style="width: 10%">入职日期</th>
+              <td style="width: 40%">{{ formData.dateOfEntry }}</td>
             </tr>
             <tr>
               <th>部门</th>
@@ -329,7 +344,7 @@
 </template>
 
 <script>
-import { getPersonalDetail } from '@/api/employess'
+import { getPersonalDetail } from '@/api/employees'
 import { getUserDetail } from '@/api/user'
 export default {
   data() {
@@ -363,6 +378,3 @@ export default {
   text-align: right;
 }
 </style>
-
-
-

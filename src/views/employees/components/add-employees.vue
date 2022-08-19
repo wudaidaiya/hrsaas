@@ -1,6 +1,7 @@
 <template>
-  <el-dialog @close="onClose" title="新增员工" :visible="visible" width="50%">
-    <el-form :model="formData" :rules="rules" label-width="120px" ref="form">
+  <!-- 删除 :visible="visible"  里的sync-->
+  <el-dialog title="新增员工" :visible="visible" width="50%" @close="onClose">
+    <el-form ref="form" :model="formData" :rules="rules" label-width="120px">
       <el-form-item label="姓名" prop="username">
         <el-input
           v-model="formData.username"
@@ -29,13 +30,13 @@
           placeholder="请选择"
         >
           <el-option
-            v-for="item in employees.hireType"
+            v-for="item in hireType"
             :key="item.id"
-            :lobel="item.value"
-            :value="item.value"
+            :label="item.value"
+            :value="item.id"
           >
-          </el-option>
-        </el-select>
+          </el-option
+        ></el-select>
       </el-form-item>
       <el-form-item label="工号" prop="workNumber">
         <el-input
@@ -53,14 +54,14 @@
         <el-select
           @focus="getDepts"
           v-model="formData.departmentName"
-          placeholder="请选择部门"
+          placeholder="请选择"
           ref="deptSelect"
         >
-          <el-option class="treeoption" value="">
+          <el-option value="" v-loading="loading" class="treeOption">
             <el-tree
-              @node-click="treeNodeClick"
               :data="depts"
               :props="treeProps"
+              @node-click="treeNodeClick"
             ></el-tree>
           </el-option>
         </el-select>
@@ -81,112 +82,101 @@
 </template>
 
 <script>
-import employees from "@/constant/employees";
-import {addEmployee} from "../../../api/employess";
-import { getDeptsApi} from "../../../api/departments";
-import { transListToTree } from "../../../utils";
+import employees from '@/constant/employees'
+const { hireType } = employees
+import { getDeptsApi } from '@/api/departments'
+import { transListToTree } from '@/utils/index'
+import { addEmployee } from '@/api/employees'
 export default {
+  name: 'Employees',
   data() {
     return {
-      employees,
-      value: "",
-      treeData: [], // 定义数组接收树形数据
-      showTree: false, // 控制树形的显示或者隐藏
-      loading: false, // 控制树的显示或者隐藏进度条
       formData: {
-        username: "",
-        mobile: "",
-        formOfEmployment: "",
-        workNumber: "",
-        departmentName: "",
-        timeOfEntry: "",
-        correctionTime: "",
+        username: '',
+        mobile: '',
+        formOfEmployment: '',
+        workNumber: '',
+        departmentName: '',
+        timeOfEntry: '',
+        correctionTime: ''
       },
       rules: {
         username: [
-          { required: true, message: "用户姓名不能为空", trigger: "blur" },
+          { required: true, message: '用户姓名不能为空', trigger: 'blur' },
           {
             min: 1,
             max: 4,
-            message: "用户姓名为1-4位",
-          },
+            message: '用户姓名为1-4位'
+          }
         ],
         mobile: [
-          { required: true, message: "手机号不能为空", trigger: "blur" },
+          { required: true, message: '手机号不能为空', trigger: 'blur' },
           {
             pattern: /^1[3-9]\d{9}$/,
-            message: "手机号格式不正确",
-            trigger: "blur",
-          },
+            message: '手机号格式不正确',
+            trigger: 'blur'
+          }
         ],
         formOfEmployment: [
-          { required: true, message: "聘用形式不能为空", trigger: "change" },
+          { required: true, message: '聘用形式不能为空', trigger: 'change' }
         ],
         workNumber: [
-          { required: true, message: "工号不能为空", trigger: "blur" },
+          { required: true, message: '工号不能为空', trigger: 'blur' }
         ],
         departmentName: [
-          { required: true, message: "部门不能为空", trigger: "change" },
+          { required: true, message: '部门不能为空', trigger: 'change' }
         ],
-        timeOfEntry: [
-          { required: true, message: "入职时间", trigger: "change" },
-        ],
+        timeOfEntry: [{ required: true, message: '入职时间', trigger: 'blur' }]
       },
+      hireType,
       depts: [],
-      treeProps: {
-        label: "name",
-      },
-    };
+      treeProps: { label: 'name' },
+      loading: false
+    }
   },
   props: {
-    visible: {
-      type: Boolean,
-      required: true,
-    },
+    visible: { type: Boolean, required: true }
   },
-
-  created() {
-    console.log(this.employees);
-  },
+  created() {},
 
   methods: {
-    // 关闭对话框
+    // 点击取消，确定关闭，清空
     onClose() {
-      this.$emit("update:visible", false);
+      this.$emit('update:visible', false)
+      // 清空form-resetFields
+      this.$refs.form.resetFields()
     },
     async getDepts() {
-      this.isTreeLoading = true;
-      const { depts } = await getDeptsApi();
-      transListToTree(depts, "");
-      console.log(depts);
-      this.depts = depts;
-      this.isTreeLoading = false;
+      this.loading = true
+      const { depts } = await getDeptsApi()
+      // console.log(depts)
+      this.depts = transListToTree(depts, '')
+      this.loading = false
     },
+    // el-tree   @node-click="treeNodeClick"
     treeNodeClick(row) {
-      this.formData.departmentName = row.name;
-      this.$refs.deptSelect.blur();
+      this.formData.departmentName = row.name
+      // 让select关闭 通过blur,点击节点，触发下面的事件
+      this.$refs.deptSelect.blur()
     },
     onSave() {
+      // validate参数回调
       this.$refs.form.validate(async (valid) => {
-        if (!valid) return;
-       await addEmployee(this.formData)
-       this.$message.success('添加成功')
-       this.onClose()
-       this.$emit('add-success')
-      });
-    },
-  },
-};
+        if (!valid) return
+        await addEmployee(this.formData)
+        this.$message.success('添加成功')
+        this.onClose()
+        this.$emit('add-success')
+      })
+    }
+  }
+}
 </script>
 
-<style scoped lang="scss">
-// 树形样式
-.el-select-dropdown__item.hover,
-.el-select-dropdown__item:hover .el-select-dropdown__item {
+<style scoped>
+.treeOption {
   background-color: #fff;
   overflow: unset;
-}
-.treeoption {
   height: 100px;
 }
 </style>
