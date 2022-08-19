@@ -38,6 +38,7 @@
                   padding: 10px;
                 "
                 alt=""
+                @click="showErCodeDialog(row.staffPhoto)"
               />
             </template>
           </el-table-column>
@@ -65,7 +66,12 @@
           </el-table-column>
           <el-table-column label="操作" sortable="" fixed="right" width="280">
             <template slot-scope="{ row }">
-              <el-button type="text" size="small" @click='$router.push("/employees/detail/"+row.id)'>查看</el-button>
+              <el-button
+                type="text"
+                size="small"
+                @click="$router.push('/employees/detail/' + row.id)"
+                >查看</el-button
+              >
               <el-button type="text" size="small">转正</el-button>
               <el-button type="text" size="small">调岗</el-button>
               <el-button type="text" size="small">离职</el-button>
@@ -98,6 +104,10 @@
     </div>
     <!-- 添加员工组件 -->
     <AddEmployees :visible.sync="showAddEmployees"></AddEmployees>
+    <!-- 弹层 -->
+    <el-dialog title='二维码' :visible.sync="ercodeDialog">
+      <canvas id="canvas"></canvas>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,9 +115,10 @@
 import { getEmployeesInfoApi, delEmployee } from "@/api/employess";
 import employees from "@/constant/employees";
 import AddEmployees from "./components/add-employees.vue";
-const { exportExcelMapPath,hireType} = employees
+import QRcode from "qrcode";
+const { exportExcelMapPath, hireType } = employees;
 export default {
-  name:'Employees',
+  name: "Employees",
   data() {
     return {
       employees: [],
@@ -117,6 +128,7 @@ export default {
         total: 0,
       },
       showAddEmployees: false,
+      ercodeDialog: false,
     };
   },
 
@@ -155,29 +167,38 @@ export default {
     async exportFn() {
       const { export_json_to_excel } = await import("@/vendor/Export2Excel");
       const { rows } = await getEmployeesInfoApi({
-        page:1,
-        size:this.page.total
-      })
-      const header = Object.keys(exportExcelMapPath)
+        page: 1,
+        size: this.page.total,
+      });
+      const header = Object.keys(exportExcelMapPath);
       // data数据
       const data = rows.map((item) => {
-        return header.map((h) =>{
-          if(h==='聘用形式'){
+        return header.map((h) => {
+          if (h === "聘用形式") {
             const findItem = hireType.find((hire) => {
-              return hire.id === item[exportExcelMapPath[h]]
-            })
-            return findItem ? findItem.value : '未知'
-          }else {
-            return item[exportExcelMapPath[h]]
+              return hire.id === item[exportExcelMapPath[h]];
+            });
+            return findItem ? findItem.value : "未知";
+          } else {
+            return item[exportExcelMapPath[h]];
           }
-        })
-      })
+        });
+      });
       export_json_to_excel({
         header,
         data, //具体数据 必填
         filename: "员工信息表", //非必填
         autoWidth: true, //非必填
         bookType: "xlsx", //非必填
+      });
+    },
+    // 点击显示弹层
+    showErCodeDialog(stoffPhoto) {
+      if (!stoffPhoto) return this.$message.error("该用户还未设置头像");
+      this.ercodeDialog = true;
+      this.$nextTick(() => {
+        const canvas = document.getElementById("canvas");
+        QRcode.toCanvas(canvas, stoffPhoto);
       });
     },
   },

@@ -2,8 +2,8 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card>
-        <el-tabs v-model="activeName" @tab-click='handleTabClick'>
-          <el-tab-pane name='account' label="登录账户设置">
+        <el-tabs v-model="activeName" @tab-click="handleTabClick">
+          <el-tab-pane name="account" label="登录账户设置">
             <!-- 放置表单 -->
             <el-form
               label-width="120px"
@@ -24,10 +24,12 @@
               </el-form-item>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane name='user' label="个人详情">
+          <el-tab-pane name="user" label="个人详情">
             <UserInfo />
           </el-tab-pane>
-          <el-tab-pane name='job' label="岗位信息" />
+          <el-tab-pane name="job" label="岗位信息">
+            <JobInfo />
+          </el-tab-pane>
         </el-tabs>
       </el-card>
     </div>
@@ -37,12 +39,13 @@
 <script>
 import UserInfo from "./components/user-info.vue";
 import { getUserDetail, saveUserDetailById } from "../../api/user";
-import Cookies from "js-cookie"
+import JobInfo from "./components/job-info.vue";
+import Cookies from "js-cookie";
 export default {
   data() {
     return {
       formData: {},
-      activeName:Cookies.get('employeeDetailTab') || 'account',
+      activeName: Cookies.get("employeeDetailTab") || "account",
     };
   },
 
@@ -51,6 +54,7 @@ export default {
   },
   components: {
     UserInfo,
+    JobInfo,
   },
   methods: {
     async loadUserDetail() {
@@ -61,9 +65,9 @@ export default {
       await saveUserDetailById(this.formData);
       this.$message.success("更新成功");
     },
-    handleTabClick(){
-      Cookies.set('employeeDetailTab',this.activeName)
-    }
+    handleTabClick() {
+      Cookies.set("employeeDetailTab", this.activeName);
+    },
   },
 };
 </script>

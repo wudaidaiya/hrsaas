@@ -27,6 +27,9 @@ for(let key in filters){
 }
 // 统一注册组件
 Vue.use(components)
+// 打印插件
+import Print from 'vue-print-nb'
+Vue.use(Print);
 // mock 假数据
 if (process.env.NODE_ENV === "production") {
   const { mockXHR } = require("../mock");
