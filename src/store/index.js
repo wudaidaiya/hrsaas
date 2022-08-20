@@ -18,6 +18,7 @@ const store = new Vuex.Store({
   plugins: [
     createVuexPersisted({
       reducer(state) {
+        // 指定存储某个模块的数据
         return {
           user: {
             token: state.user.token

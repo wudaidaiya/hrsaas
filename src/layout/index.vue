@@ -5,7 +5,7 @@
     <sidebar class="sidebar-container" />
     <!-- 主体内容 -->
     <div class="main-container">
-      <!-- 头部 -->
+      <!-- 固定头部 -->
       <div :class="{'fixed-header':fixedHeader}">
         <navbar />
       </div>

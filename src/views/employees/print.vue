@@ -1,7 +1,6 @@
 <template>
   <div class="dashboard-container" id="myPrint">
-    <!-- 打印功能：自定义指令，加字符串选择器  main。js引入注册-->
-    <el-button v-print="'#myPrint'">打印</el-button>
+    <el-button v-print="'#myPrint'" size="small" type="primary">打印</el-button>
     <div class="app-container">
       <el-card>
         <el-breadcrumb separator="/" class="titInfo">
@@ -11,7 +10,6 @@
           </el-breadcrumb-item>
           <el-breadcrumb-item>打印</el-breadcrumb-item>
         </el-breadcrumb>
-        <!--  -->
         <div v-if="type === 'personal'">
           <h2 class="centInfo">员工信息表</h2>
           <table cellspacing="0" width="100%" class="tableList">
@@ -38,7 +36,7 @@
             </tr>
             <tr>
               <th>出生日期</th>
-              <td colspan="6">{{ formData.dateOfBirth | formatTime }}</td>
+              <td colspan="6">{{ formData.dateOfBirth | formaTime }}</td>
             </tr>
             <tr>
               <th>最高学历</th>
@@ -225,7 +223,6 @@
           </table>
           <div class="foot">签字：___________日期:___________</div>
         </div>
-        <!--  -->
         <div v-else>
           <h2 class="centInfo">岗位信息表</h2>
           <table cellspacing="0" width="100%" class="tableList">
@@ -345,7 +342,7 @@
 
 <script>
 import { getPersonalDetail } from '@/api/employees'
-import { getUserDetail } from '@/api/user'
+import { getUserDetail as getUserDetailById } from '@/api/user'
 export default {
   data() {
     return {
@@ -364,7 +361,7 @@ export default {
       this.formData = await getPersonalDetail(this.userId) // 获取个人基本信息
     },
     async getJobDetail() {
-      const userInfo = await getUserDetail(this.userId)
+      const userInfo = await getUserDetailById(this.userId)
       const jobInfo = await getJobDetail(this.userId) // 获取个人基本信息
       this.formData = { ...userInfo, ...jobInfo }
     }

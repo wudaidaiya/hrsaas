@@ -1,19 +1,19 @@
 import request from '@/utils/request'
-/**
- * 获取权限
- */
 
-export function getPermissionList() {
+// 获取权限
+export function getPermissionList(params) {
   return request({
     url: '/sys/permission',
+    params
   })
 }
+
 /**
- * 添加权限
- * @param {*} data 
- * @returns 
+ *  添加权限点
+ * @param {*} data
+ * @returns  Promise
  */
-export function addPermission(data){
+export function setPermission(data) {
   return request({
     url: '/sys/permission',
     method: 'POST',

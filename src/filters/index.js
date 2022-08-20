@@ -1,4 +1,6 @@
 import dayjs from 'dayjs'
-export const formatTime = (val) => {
+
+// 过滤时间
+export const formaTime = (val) => {
   return dayjs(val).format('YYYY-MM-DD')
 }

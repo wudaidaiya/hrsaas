@@ -1,5 +1,6 @@
 <template>
   <div class="user-info">
+    <!-- 打印 -->
     <i
       class="el-icon-printer"
       @click="$router.push(`/employees/print/${userId}?type=personal`)"
@@ -62,17 +63,14 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
-            <UploadImage
-              ref="headerImg"
-              @onSuccess="headerImgUploadSuccess"
-            ></UploadImage>
+            <upload-img @onSuccess="onSuccess" ref="employeesImg" />
           </el-form-item>
         </el-col>
       </el-row>
       <!-- 保存个人信息 -->
       <el-row class="inline-info" type="flex" justify="center">
         <el-col :span="12">
-          <el-button type="primary" @click="onSaveUserDetail"
+          <el-button type="primary" @click="saveUserDetailById"
             >保存更新</el-button
           >
           <el-button @click="$router.back()">返回</el-button>
@@ -97,15 +95,10 @@
           </el-select>
         </el-form-item>
         <!-- 个人头像 -->
-
         <!-- 员工照片 -->
-
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
-          <UploadImage
-            ref="employeePic"
-            @onSuccess="employeePicUploadSuccess"
-          ></UploadImage>
+          <upload-img ref="employeesPhoto" @onSuccess="employeesPhotoSuccess" />
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -391,7 +384,7 @@
         <!-- 保存员工信息 -->
         <el-row class="inline-info" type="flex" justify="center">
           <el-col :span="12">
-            <el-button type="primary" @click="onSaveEmployeesInfo"
+            <el-button type="primary" @click="upEmployeesInfo"
               >保存更新</el-button
             >
             <el-button @click="$router.back()">返回</el-button>
@@ -403,10 +396,13 @@
 </template>
 
 <script>
-import UploadImage from '@/components/UploadImage'
 import EmployeeEnum from '@/constant/employees'
-import { getUserDetail, saveUserDetail } from '@/api/user'
-import { getPersonalDetail, updatePersonal } from '@/api/employees'
+import { getUserDetail } from '@/api/user'
+import {
+  saveUserDetailById,
+  getPersonalDetail,
+  updatePersonal
+} from '@/api/employees'
 
 export default {
   data() {
@@ -481,47 +477,42 @@ export default {
   },
   created() {
     this.getUserDetail()
-    this.getPersonalDetail()
+    this.loadEmployeesInfo()
   },
-  components: { UploadImage },
   methods: {
-    // 加载个人详情上
     async getUserDetail() {
       this.userInfo = await getUserDetail(this.userId)
-      // 回显照片，加入fileList数组
-      this.$refs.headerImg.fileList.push({ url: this.userInfo.staffPhoto })
+      this.$refs.employeesImg.fileList.push({
+        url: this.userInfo.staffPhoto
+      })
     },
-    // 加载个人信息
-    async getPersonalDetail() {
+    // 加载员工详情
+    async loadEmployeesInfo() {
       this.formData = await getPersonalDetail(this.userId)
-      // 回显照片，加入fileList数组
-      this.$refs.employeePic.fileList.push({ url: this.formData.staffPhoto })
+      this.$refs.employeesPhoto.fileList.push({
+        url: this.formData.staffPhoto
+      })
     },
-    // 更新员工基本信息
-    async onSaveUserDetail() {
-      // 图片未上传完成，不能发请求
-      if (this.$refs.headerImg.loading) {
-        return this.$message.error('头像正在上传')
-      }
-      await saveUserDetail(this.userInfo, this.userId)
-      this.$message.success('更新成功')
-      this.userInfo = await getUserDetail(this.userId)
-    },
-    // 更新个人详情的基础信息
-    async onSaveEmployeesInfo() {
-      // 图片未上传完成，不能发请求
-      if (this.$refs.employeePic.loading) {
-        return this.$message.error('员工照片正在上传')
-      }
+    // 更新员工详细信息
+    async upEmployeesInfo() {
+      if (this.$refs.employeesPhoto.loading)
+        return this.$message.error('头像正在上传中')
       await updatePersonal(this.formData)
       this.$message.success('更新成功')
     },
-    //图片上传成功，将值存入提交数据中
-    headerImgUploadSuccess({ url }) {
+    // 更新用户信息
+    async saveUserDetailById() {
+      if (this.$refs.employeesImg.loading)
+        return this.$message.error('图片正在上传中')
+      await saveUserDetailById(this.userInfo)
+      this.$message.success('更新成功')
+    },
+    // 监听员工头像
+    onSuccess({ url }) {
       this.userInfo.staffPhoto = url
     },
-    //图片上传成功，将值存入提交数据中
-    employeePicUploadSuccess({ url }) {
+    // 监听员工照片
+    employeesPhotoSuccess({ url }) {
       this.formData.staffPhoto = url
     }
   }

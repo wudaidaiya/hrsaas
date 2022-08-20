@@ -14,10 +14,10 @@ export function removeToken() {
   return Cookies.remove(TokenKey)
 }
 
-// 存储时间戳
 export function setTokenTime() {
   Cookies.set('tokenTime', Date.now())
 }
+
 export function getTokenTime() {
   return Cookies.get('tokenTime')
 }

@@ -1,8 +1,10 @@
 import request from '@/utils/request'
+
 /**
- * 登陆情求
- * @param {Object} data password mobilep
- * @returns promise
+   登录请求
+ * 
+ * @param {Object} data 
+ * @returns Promise
  */
 export function login(data) {
   return request({
@@ -13,36 +15,23 @@ export function login(data) {
 }
 
 /**
- *获取用户信息
+ *  获取用户基本资料
  * @returns Promise
  */
-export function getUserInfoApi() {
+export function getUserInfo() {
   return request({
     url: '/sys/profile',
-    method: 'post'
+    method: 'POST'
   })
 }
+
 /**
- * 获取详细的信息
- * @param {*} id
- * @returns promise
+ *  用户详细信息
+ * @param {*} id 
+ * @returns 
  */
 export function getUserDetail(id) {
   return request({
-    url: '/sys/user/' + id
-  })
-}
-// /sys/user/{id}
-
-/**
- * 保存员工基本信息
- * @param {*} id
- * @returns promise
- */
-export function saveUserDetail(data, id) {
-  return request({
     url: '/sys/user/' + id,
-    method: 'put',
-    data
   })
 }

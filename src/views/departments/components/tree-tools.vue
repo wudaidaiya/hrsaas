@@ -1,9 +1,7 @@
 <template>
   <el-row type="flex" style="width: 100%">
-    <!-- 左侧 -->
     <el-col>{{ treeNode.name }}</el-col>
-    <!-- 右侧 -->
-    <el-col :span="5">
+    <el-col :span="4">
       <el-row type="flex">
         <el-col>{{ treeNode.manager }}</el-col>
         <el-col>
@@ -12,14 +10,16 @@
               操作<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
+              <!-- 将数据传到父组件 -->
               <el-dropdown-item @click.native="$emit('add', treeNode)"
-                >添加子部门</el-dropdown-item
+                >添加部门</el-dropdown-item
               >
+              <!-- 头部公司不用 -->
               <template v-if="!isRoot">
-                <el-dropdown-item @click.native="$emit('edit', treeNode)"
+                <el-dropdown-item @click.native="$emit('edit',treeNode)"
                   >编辑部门</el-dropdown-item
                 >
-                <el-dropdown-item @click.native="onRemove"
+                <el-dropdown-item @click.native="removeBtn"
                   >删除部门</el-dropdown-item
                 >
               </template>
@@ -32,9 +32,13 @@
 </template>
 
 <script>
-import { delDeptsApi } from '@/api/departments'
+import { delDeptsInfoApi } from '@/api/departments'
 export default {
-  name: 'treeTools',
+  name: 'Tree',
+  components: {},
+  data() {
+    return {}
+  },
   props: {
     treeNode: {
       type: Object,
@@ -45,31 +49,28 @@ export default {
       default: false
     }
   },
-  data() {
-    return {}
-  },
-
   created() {},
-
   methods: {
-    // 操作下的    删除部门
-    // delDeptsApi（）重新渲染页面
-    async onRemove() {
+    // 删除部门
+    async removeBtn() {
       try {
-        await this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        await this.$confirm('是否删除该部门?', '提示', {
+          confirmButtonText: '删除',
           cancelButtonText: '取消',
           type: 'warning'
         })
-        await delDeptsApi(this.treeNode.id)
-        // 重新渲染页面
-        this.$message.success('删除成功')
-        this.$emit('remove') //调用父组件的树形结构渲染
-        // console.log(this.treeNode.id)
-      } catch (e) {}
-    }
+        await delDeptsInfoApi(this.treeNode.id)
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        })
+        // this.$parent.loadDepts()
+        this.$emit('delDepts')
+      } catch (error) {}
+    },
+
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

@@ -1,17 +1,27 @@
 import request from '@/utils/request'
-export function getEmployeesApi() {
+
+/**
+ *  简单员工
+ * @returns Promise
+ */
+export function getEmployeesListApi() {
   return request({
     url: '/sys/user/simple'
   })
 }
 
-// 获取详细的员工数据
+/**
+ *  获取员工信息详情
+ * @param {*} params
+ * @returns
+ */
 export function getEmployeesInfoApi(params) {
   return request({
     url: '/sys/user',
     params
   })
 }
+
 /**
  * 删除员工接口
  * ****/
@@ -34,16 +44,27 @@ export function addEmployee(data) {
   })
 }
 
-//
-/**
- * 批量导入员工
- * @param {*} data  员工数组
- * @returns
- */
-export function importEmployees(data) {
+/** *
+ *  封装一个导入员工的接口
+ *
+ * ***/
+
+export function importEmployee(data) {
   return request({
-    method: 'post',
     url: '/sys/user/batch',
+    method: 'post',
+    data
+  })
+}
+
+/** *
+ *
+ * 保存员工的基本信息
+ * **/
+export function saveUserDetailById(data) {
+  return request({
+    url: `/sys/user/${data.id}`,
+    method: 'put',
     data
   })
 }
@@ -69,14 +90,23 @@ export function updatePersonal(data) {
 }
 
 /**
- * 添加分配角色 /sys/user/assignRoles
- * @param {*} data  员工id  角色ID数组
- * @returns promise
- */
-export function assignRoles(data) {
+ * 保存岗位信息
+ * ****/
+export function updateJob(data) {
   return request({
-    url: `/sys/user/assignRoles`,
+    url: `/employees/${data.userId}/jobs`,
     method: 'put',
     data
+  })
+}
+
+/** *
+ * 给用户分配角色
+ * ***/
+export function assignRoles(data) {
+  return request({
+    url: '/sys/user/assignRoles',
+    data,
+    method: 'put'
   })
 }

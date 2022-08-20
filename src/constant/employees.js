@@ -416,15 +416,13 @@ export default {
       value: '离职'
     }
   ],
-  // 员工映射表
-  mapKeyPath: {
+  importMapKeyPath: {
     入职日期: 'timeOfEntry',
-    姓名: 'username',
+    姓名: 'name',
     工号: 'workNumber',
     手机号: 'mobile',
     转正日期: 'correctionTime'
   },
-  // 导出映射表
   exportExcelMapPath: {
     手机号: 'mobile',
     姓名: 'username',

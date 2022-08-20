@@ -1,95 +1,81 @@
 <template>
   <div class="dashboard-container">
     <div class="app-container">
-      <el-card class="box-card">
-        <!-- 1 封装的组件-->
-        <tree-tools @add="showAddDept" :treeNode="company" :isRoot="true" />
-        <!-- 2 el-tree   element组件-->
-        <el-tree
-          :data="treeData"
-          :props="defaultProps"
-          default-expand-all
-          v-loading="loading"
-        >
-          <!-- { name: '总裁办', manager: '张三' } -->
-          <!-- <template v-slot="scope.data"> -->
+      <el-card class="box-card" v-loading="loading">
+        <!-- 头部 -->
+        <Tree :treeNode="company" :isRoot="true" @add="showAddDepts"></Tree>
+        <!-- 树形 -->
+        <el-tree :data="departs" :props="defaultProps" default-expand-all>
           <template v-slot="{ data }">
-            <tree-tools
-              @add="showAddDept"
+            <Tree
               :treeNode="data"
-              @remove="getDepts"
+              @delDepts="loadDepts"
+              @add="showAddDepts"
               @edit="showEdit"
-            >
-            </tree-tools>
+            />
           </template>
         </el-tree>
       </el-card>
     </div>
-    <!-- 将点击的treeNode传递给add组件 -->
-    <!-- 添加部门的弹层 -->
-    <!--    :visible.sync="dialogVisible"  应用的。 -->
-    <add-dept
-      ref="addDept"
-      @add-success="getDepts"
+    <!-- 添加弹层 -->
+    <AddDept
       :visible.sync="dialogVisible"
-      :currentNode="currentNode"
-    ></add-dept>
+      :currentDept="currentDept"
+      ref="addDepts"
+    ></AddDept>
   </div>
 </template>
 
 <script>
-import treeTools from './components/tree-tools'
-import { getDeptsApi } from '@/api/departments'
-import { transListToTree } from '@/utils/index'
 import AddDept from './components/add-dept.vue'
+import { transListToTree } from '@/utils'
+import Tree from '@/views/departments/components/tree-tools.vue'
+import { getDeptsApi } from '@/api/departments'
 export default {
-  components: {
-    treeTools,
-    AddDept
-  },
   data() {
     return {
-      treeData: [
-        { name: '总裁办', children: [{ name: '董事会' }] },
-        { name: '行政部' },
-        { name: '人事部' }
-      ],
-      defaultProps: { label: 'name' },
-      company: { name: '传智教育', manager: '负责人' },
-      // 弹层
+      departs: [],
+      loading: false,
+      defaultProps: {
+        label: 'name' // 展示到树状的数据
+      },
       dialogVisible: false,
-      // 穿递给add   treenode
-      currentNode: {},
-      loading: false
+      company: { name: '传智教育', manager: '负责人' },
+      currentDept: {}
     }
   },
-
+  components: {
+    Tree,
+    AddDept
+  },
   created() {
-    this.getDepts()
+    this.loadDepts()
   },
 
   methods: {
-    // 数据,页面重新渲染
-    async getDepts() {
+    // 获取树状信息
+    async loadDepts() {
       this.loading = true
       const res = await getDeptsApi()
-      // console.log(res)
-      this.treeData = transListToTree(res.depts, '')
-      // console.log(this.treeData)
+      this.departs = transListToTree(res.depts, '')
       this.loading = false
     },
-    // 点击显示弹层
-    showAddDept(val) {
-      this.currentNode = val
+    // 开启弹层 存子向父传的数据
+    showAddDepts(val) {
       this.dialogVisible = true
+      this.currentDept = val
     },
-    // 发送请求需要id,需要从tree===>传点击的那个部门给index父组件中====传给add
+    // 显示编辑弹框
     showEdit(val) {
       this.dialogVisible = true
-      this.$refs.addDept.getDeptById(val.id)
+      this.$refs.addDepts.getDeptsById(val.id)
     }
   }
 }
 </script>
 
-<style scoped lang="less"></style>
+<style scoped lang="scss">
+.el-dropdown-link {
+  cursor: pointer;
+}
+</style>

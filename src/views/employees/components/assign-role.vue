@@ -1,37 +1,34 @@
 <template>
-  <div>
-    <el-dialog
-      title="分配角色"
-      :visible="visible"
-      @close="close"
-      @open="onOpen"
-    >
-      <el-checkbox-group v-model="checkedList">
-        <el-checkbox :label="item.id" v-for="item in rows" :key="item.id">
-          {{ item.name }}
-        </el-checkbox>
-      </el-checkbox-group>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="close">取 消</el-button>
-        <el-button type="primary" @click="assignRole">确 定</el-button>
-      </span>
-    </el-dialog>
-  </div>
+  <el-dialog
+    title="分配角色"
+    :visible="visible"
+    @close="onClose"
+    @open="onOpen"
+  >
+    <!-- 多选框 -->
+    <el-checkbox-group v-model="checkList">
+      <el-checkbox v-for="item in roles" :key="item.id" :label="item.id">
+        {{ item.name }}
+      </el-checkbox>
+    </el-checkbox-group>
+    <span slot="footer" class="dialog-footer">
+      <center>
+        <el-button @click="onClose">取 消</el-button>
+        <el-button type="primary" @click="assignRoles">确 定</el-button>
+      </center>
+    </span>
+  </el-dialog>
 </template>
 
 <script>
-import { getRolesApi } from '@/api/role'
+import { getEmployeeApi } from '@/api/setting'
 import { getUserDetail } from '@/api/user'
 import { assignRoles } from '@/api/employees'
-
 export default {
-  name: 'AssignRoleDialog',
-
   data() {
     return {
-      checkedList: [],
-      //   员工列表
-      rows: []
+      checkList: [],
+      roles: []
     }
   },
   props: {
@@ -39,46 +36,41 @@ export default {
       type: Boolean,
       required: true
     },
-    currentEmployeesId: {
-      type: String,
-      required: true
+    currentId: {
+      type: String
     }
   },
   created() {},
-
   methods: {
-    close() {
+    onClose() {
       this.$emit('update:visible', false)
     },
-
-    // 对话框打开的时候触发，if/open
-    async onOpen() {
-      this.getRolesApi() //总的角色列表
-      this.getUserDetail() //获取原有的选中角色
+    // 获取多选数据
+    async getRolesList() {
+      const { rows } = await getEmployeeApi()
+      this.roles = rows
     },
-    //总的弹层---角色列表
-    async getRolesApi() {
-      const res = await getRolesApi()
-      this.rows = res.rows
+    // 获取员工角色
+    async getEmployeesRoles() {
+      const { roleIds } = await getUserDetail(this.currentId)
+      this.checkList = roleIds
     },
-    // 获取已有的角色
-    async getUserDetail() {
-      const res = await getUserDetail(this.currentEmployeesId)
-      // 获取已有的角色给checkedList----element默认的选中的数组
-      this.checkedList = res.roleIds
+    onOpen() {
+      this.getRolesList()
+      this.getEmployeesRoles()
     },
-
-    async assignRole() {
-      if (!this.checkedList.length) return this.$message.error('请选择角色')
+    // 确认分配角色
+    async assignRoles() {
+        // 若数组长度为0 则未分配
+      if (!this.checkList.length) return this.$message.error('至少分配一个角色')
+    //   发起请求
       await assignRoles({
-        id: this.currentEmployeesId,
-        roleIds: this.checkedList
+        id: this.currentId,
+        roleIds: this.checkList
       })
-      this.$message.success('分配角色成功')
-      this.close()
+      this.$message.success('分配成功')
+      this.onClose()
     }
   }
 }
 </script>
-
-<style scoped></style>

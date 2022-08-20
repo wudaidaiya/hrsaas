@@ -1,11 +1,6 @@
 <template>
-  <!-- 关于弹层的组件   包含表单  title计算属性显示-->
-  <el-dialog
-    :title="dialogDeftName"
-    :visible="visible"
-    width="50%"
-    @close="onClose"
-  >
+  <!-- 新增部门 -->
+  <el-dialog :title="title" :visible="visible" width="50%" @close="onClose">
     <el-form
       ref="form"
       label-width="100px"
@@ -13,130 +8,119 @@
       :rules="formRules"
     >
       <el-form-item label="部门名称" prop="name">
-        <el-input
-          placeholder="请输入部门名称"
-          v-model="formData.name"
-        ></el-input>
+        <el-input placeholder="1-50个字符" v-model="formData.name"></el-input>
       </el-form-item>
       <el-form-item label="部门编码" prop="code">
-        <el-input
-          placeholder="请输入部门编码"
-          v-model="formData.code"
-        ></el-input>
+        <el-input placeholder="1-50个字符" v-model="formData.code"></el-input>
       </el-form-item>
       <el-form-item label="部门负责人" prop="manager">
         <el-select
-          placeholder="请选择部门负责人"
+          placeholder="请选择负责人"
           style="width: 100%"
           v-model="formData.manager"
         >
           <el-option
-            v-for="item in employees"
-            :key="item.id"
             :label="item.username"
             :value="item.username"
+            v-for="item in employeeList"
+            :key="item.id"
           ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="部门介绍" prop="introduce">
         <el-input
           type="textarea"
-          placeholder="请输入部门介绍"
+          placeholder="1-300个字符"
           v-model="formData.introduce"
         ></el-input>
       </el-form-item>
     </el-form>
-
     <span slot="footer" class="dialog-footer">
-      <!-- onClose onSave  是自定义的事件，element的组件绑定的是@click设置false -->
-      <el-button @click.native="onClose">取 消</el-button>
+      <el-button @click="onClose">取 消</el-button>
       <el-button type="primary" @click="onSave">确 定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
-// 获取数据、添加部门、编辑部门
+import { getEmployeesListApi } from '@/api/employees'
 import {
   getDeptsApi,
-  addDeptApi,
-  editDeptApi,
-  setEditDeptsApi
+  addDept,
+  getDeptByIdApi,
+  editDeptByIdApi
 } from '@/api/departments'
-import { getEmployeesApi } from '@/api/employees'
 export default {
-  name: 'AddDept',
-
+  components: {},
   data() {
-    // 自定义校验规则
     const checkDeptName = async (rule, value, callback) => {
+      // 判断该部门是否有子部门  若没有则直接return
+      if (!this.currentDept.children) return callback()
+      // 若有id则是编辑
       if (this.formData.id) {
+        // 发起获取部门数据
         const { depts } = await getDeptsApi()
-        const filtersDepts = depts.filter(
-          (item) =>
-            item.pid === this.formData.pid && item.id !== this.formData.id
-        )
-        // 不能是一级其他部门，可以是自己
-        const isRepeat = filtersDepts.some((item) => item.name === value)
+        // 筛选除了自己以外的同级部门
+        const isRepeat = depts
+          .filter(
+            (item) =>
+              item.pid === this.formData.pid && item.id !== this.formData.pid
+          )
+          .some((item) => item.name !== value) //不能和同级其他部门重名
+        // 重复则提示错误
         isRepeat ? callback(new Error('部门重复')) : callback()
       } else {
-        // 对于没有children的组织架构的，，直接调用callback，否则报错
-        if (!this.currentNode.children) return callback()
-        const isRepeat = this.currentNode.children.some(
+        // 判断同级是否有重复
+        let isRepeat = this.currentDept.children.some(
           (item) => item.name === value
         )
+        // 重复则提示错误
         isRepeat ? callback(new Error('部门重复')) : callback()
       }
     }
-
-    //编码重复
-    const checkDeptCode = async (rule, value, cb) => {
+    const checkDeptCode = async (rule, value, callback) => {
       const { depts } = await getDeptsApi()
       let isRepeat
       if (this.formData.id) {
-        // 编辑
-        // 先筛选剔除点击的这个id,再添加数据
         isRepeat = depts
           .filter((item) => item.id !== this.formData.id)
           .some((item) => item.code === value)
       } else {
-        // 添加
-        isRepeat = depts.some((item) => item.code === value)
+        // 判断是否编码有重复
+        const isRepeat = depts.some((item) => item.code === value)
       }
-
-      isRepeat ? cb(new Error('编码重复')) : cb()
+      // 重复则提示错误
+      isRepeat ? callback(new Error('部门编码重复')) : callback()
     }
     return {
       formData: {
-        name: '',
-        code: '',
-        manager: '',
-        introduce: ''
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
       },
+      // 负责人列表
+      employeeList: [],
+      // 规则
       formRules: {
         name: [
-          { required: true, message: '请输入部门名称', trigger: 'blur' },
+          { required: true, message: '请输入内容', trigger: 'blur' },
+          // 自定义校验规则
           {
-            validator: checkDeptName,
-            trigger: 'blur'
+            trigger: 'change',
+            validator: checkDeptName
           }
         ],
         code: [
-          { required: true, message: '请输入部门编码', trigger: 'blur' },
+          { required: true, message: '请输入内容', trigger: 'blur' },
           {
-            validator: checkDeptCode,
-            trigger: 'blur'
+            trigger: 'change',
+            validator: checkDeptCode
           }
         ],
-        manager: [
-          // trigger: 'change'触发的时机是变化的时候而不是失去焦点的时候
-          { required: true, message: '请输入部门负责人', trigger: 'change' }
-        ],
-        introduce: [
-          { required: true, message: '请输入部门介绍', trigger: 'blur' }
-        ]
-      },
-      employees: []
+        manager: [{ required: true, message: '请输入内容', trigger: 'blur' }],
+        introduce: [{ required: true, message: '请输入内容', trigger: 'blur' }]
+      }
     }
   },
   props: {
@@ -144,68 +128,67 @@ export default {
       type: Boolean,
       required: true
     },
-    // 父传子的变量treenode
-    currentNode: {
+    currentDept: {
       type: Object,
       required: true
     }
   },
   created() {
-    this.getEmployees()
-  },
-  computed: {
-    dialogDeftName() {
-      return this.formData.id ? '编辑部门' : '添加部门'
-    }
+    this.getEmployeesList()
   },
   methods: {
-    // 部门负责人
-    async getEmployees() {
-      const res = await getEmployeesApi()
-      this.employees = res
-      // console.log(res)
+    async getEmployeesList() {
+      const res = await getEmployeesListApi()
+      this.employeeList = res
     },
+    // 关闭事件
     onClose() {
       this.$emit('update:visible', false)
-      //
+      // 重置校验规则
       this.$refs.form.resetFields()
-      //
+      // 重置表单数据--清除id---区分添加以及编辑
       this.formData = {
-        name: '',
-        code: '',
-        manager: '',
-        introduce: ''
+        name: '', // 部门名称
+        code: '', // 部门编码
+        manager: '', // 部门管理者
+        introduce: '' // 部门介绍
       }
     },
-    // 取消和确定需要单独去写逻辑，删除自带的@click事件
-    // 确定按钮
+    // 添加部门
     async onSave() {
-      await this.$refs.form.validate()
+      // 编辑
       if (this.formData.id) {
-        // 提交编辑后的数据
-        await setEditDeptsApi(this.formData)
+        await editDeptByIdApi(this.formData)
+        // 关闭弹框
+        this.onClose()
+        // 调用父组件的方法
+        this.$parent.loadDepts()
         this.$message.success('编辑成功')
-        this.onClose()
-        this.$emit('add-success')
+
+        // 添加
       } else {
-        // 😤😤没有id,,添加的请求方式
-        // 点击之前去检验表单
-        // 缺少数据  父级部门的id  可以使用currentnode中的
-        this.formData.pid = this.currentNode.id
-        // console.log(this.formData)
-        await addDeptApi(this.formData)
-        this.$message.success('新增部门成功')
+        await this.$refs.form.validate()
+        this.formData.pid = this.currentDept.id
+        await addDept(this.formData)
+        this.$message.success('添加部门成功')
+        // 关闭弹框   checkDeptCode for the
         this.onClose()
-        this.$emit('add-success')
+        // 调用父组件的方法
+        this.$parent.loadDepts()
       }
+      // this.$message.error('操作部门失败')
     },
-    //弹窗组件===获取编辑数据，用起来比较方便，触发方式是点击编辑的时候
-    async getDeptById(id) {
-      // 回显数据
-      this.formData = await editDeptApi(id)
+    async getDeptsById(id) {
+      const res = await getDeptByIdApi(id)
+      this.formData = res
+    }
+  },
+  computed: {
+    title() {
+      return this.formData.id ? '编辑部门' : '添加部门'
     }
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

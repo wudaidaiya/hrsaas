@@ -41,7 +41,7 @@ export default {
   width: 100%;
   height: 50px;
   line-height: 50px;
-  // background: red;
+  // background: #2b2f3a;
   text-align: center;
   overflow: hidden;
 
@@ -50,7 +50,7 @@ export default {
     width: 100%;
 
     // 大图样式
-    .sidebar-logo {
+    & .sidebar-logo {
       width: 140px;
       vertical-align: middle;
       margin-right: 12px;

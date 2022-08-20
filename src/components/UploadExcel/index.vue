@@ -29,7 +29,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import XLSX from 'xlsx'
 export default {
@@ -138,7 +137,6 @@ export default {
   }
 }
 </script>
-
 <style scoped lang="scss">
 .upload-excel {
   display: flex;

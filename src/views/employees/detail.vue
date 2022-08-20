@@ -2,11 +2,10 @@
   <div class="dashboard-container">
     <div class="app-container">
       <el-card>
-        <el-tabs v-model="activeName" @tab-click="handleTabClick">
-          <el-tab-pane label="登录账户设置" name="account">
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+          <el-tab-pane name="one" label="登录账户设置">
             <!-- 放置表单 -->
             <el-form
-              :model="formData"
               label-width="120px"
               style="margin-left: 120px; margin-top: 30px"
             >
@@ -25,11 +24,11 @@
               </el-form-item>
             </el-form>
           </el-tab-pane>
-          <el-tab-pane label="个人详情" name="detail"
-            ><userInfo></userInfo
-          ></el-tab-pane>
-          <el-tab-pane label="岗位信息" name="job">
-            <jobInfo />
+          <el-tab-pane name="two" label="个人详情">
+            <UserInfo></UserInfo>
+          </el-tab-pane>
+          <el-tab-pane name="three" label="岗位信息" >
+            <JobInfo />
           </el-tab-pane>
         </el-tabs>
       </el-card>
@@ -38,41 +37,43 @@
 </template>
 
 <script>
-import { getUserDetail, saveUserDetail } from '@/api/user'
-import userInfo from './components/user-info.vue'
 import Cookies from 'js-cookie'
-
-import jobInfo from './components/job-info.vue'
+import { getUserDetail } from '@/api/user'
+import { saveUserDetailById } from '@/api/employees'
+import UserInfo from '@/views/employees/components/user-info.vue'
+import JobInfo from '@/views/employees/components/job-info.vue'
 export default {
+  components: {},
   data() {
     return {
-      formData: {},
-      activeName: Cookies.get('employeeDetailTab') || 'account'
+      activeName: Cookies.get('active') || 'one',
+      formData: {}
     }
   },
   components: {
-    userInfo,
-    jobInfo
+    UserInfo,
+    JobInfo
   },
   created() {
-    this.getUserDetail()
+    this.loadingUserInfo()
   },
-
   methods: {
-    async getUserDetail() {
+    // 获取用户id发起请求获取详情
+    async loadingUserInfo() {
       const res = await getUserDetail(this.$route.params.id)
-      console.log(res)
       this.formData = res
     },
+    // 更新数据
     async onSave() {
-      await saveUserDetail(this.formData, this.$route.params.id)
-      this.$message.success('保存成功')
+      await saveUserDetailById(this.formData)
+      this.$message.success('更新成功')
+      this.$router.go(-1)
     },
-    handleTabClick() {
-      Cookies.set('employeeDetailTab', this.activeName)
+    handleClick() {
+      Cookies.set('active', this.activeName)
     }
   }
 }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss"></style>

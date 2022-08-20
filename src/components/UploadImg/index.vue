@@ -1,114 +1,114 @@
 <template>
   <div>
     <el-upload
-       v-loading="loading"
-    element-loading-text="拼命加载中"
-    element-loading-spinner="el-icon-loading"
-    element-loading-background="rgba(0, 0, 0, 0.8)"
-      :file-list="fileList"
+      v-loading="loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
       action="#"
-      :http-request="onRequest"
+      list-type="picture-card"
+      :http-request="upImg"
+      :file-list="fileList"
       :on-change="onChange"
       :on-remove="onRemove"
       :on-preview="onPreview"
-      :before-upload="beforeUpload"
       :limit="1"
-      list-type="picture-card"
-      class="custom-upload"
       :class="fileList.length ? 'hide' : ''"
+      class="upCard"
+      :before-upload="beforeUpload"
     >
       <i class="el-icon-plus"></i>
     </el-upload>
-    <!-- 弹层 -->
-    <el-dialog :visible.sync="previewImgDialog">
-      <img :src="imgUrl" />
+
+    <el-dialog :visible.sync="showImg">
+      <img :src="imgSrc" style="width: 100%" />
     </el-dialog>
   </div>
 </template>
+
 <script>
-import COS from "cos-js-sdk-v5";
-// id：   AKIDiGZaLq54mDNWO0LSKwIOEo79vRhgQt5z
-// key： f3A0YqqZ1C6JFvKSIrABvNZU8VbQyFFz
-var cos = new COS({
-  SecretId: "AKIDiGZaLq54mDNWO0LSKwIOEo79vRhgQt5z",
-  SecretKey: "f3A0YqqZ1C6JFvKSIrABvNZU8VbQyFFz",
-});
-console.log(cos);
+// id:AKIDd6IDsGNDm45pJWT9droUs0rRknY2FCsH
+// key:91cx1oKZXEenfGadPu86nDMEo79uPebH
+
+import COS from 'cos-js-sdk-v5'
+const cos = new COS({
+  SecretId: 'AKIDd6IDsGNDm45pJWT9droUs0rRknY2FCsH',
+  SecretKey: '91cx1oKZXEenfGadPu86nDMEo79uPebH'
+})
+console.log(cos)
 export default {
-  name: "UploadImg",
+  name: 'UploadImg',
+  components: {},
   data() {
     return {
       fileList: [],
-      previewImgDialog: false,
-      imgUrl: "",
-      loading:false
-    };
+      imgSrc: '',
+      showImg: false,
+      loading: false
+    }
   },
   created() {},
   methods: {
-    onRequest({file}) {
-        this.loading = true
+    upImg({ file }) {
+      this.loading = true
+      // console.log(111);
       cos.putObject(
         {
-          Bucket: "hm-dai-1313341664" /* 必须 */,
-          Region: "ap-shanghai" /* 存储桶所在地域，必须字段 */,
-          Key: file.name /* 必须 */,
-          StorageClass: "STANDARD",
+          Bucket: 'rz-31-1313341602' /* 填入您自己的存储桶，必须字段 */,
+          Region: 'ap-shanghai' /* 存储桶所在地域，例如ap-beijing，必须字段 */,
+          Key: file.name,
+          StorageClass: 'STANDARD',
           Body: file, // 上传文件对象
           onProgress: function (progressData) {
-            console.log(JSON.stringify(progressData));
-          },
-        },
-        // 成功data    err=null失败
-       (err, data) => {
-        // 如果上传失败
-          if(err || data.statusCode !== 200){
-            return this.$message.error('上传失败')
+            console.log(JSON.stringify(progressData))
           }
-          this.$emit('onSuccess',{
-            url:'http://'+data.Location,
-          })
+        },
+        (err, data) => {
           this.loading = false
+          if (err || data.statusCode !== 200) {
+            return this.$message.error('上传失败，请重试！！')
+          }
+          //   console.log(data)
+          this.$emit('onSuccess', {
+            url: 'http://' + data.Location
+          })
         }
-      );
+      )
     },
-    // 上传
     onChange(file, fileList) {
-      this.fileList = fileList;
+      this.fileList = fileList
     },
-    // 删除
     onRemove(file, fileList) {
-      this.fileList = fileList;
+      this.fileList = fileList
     },
-    // 预览
     onPreview(file) {
-      this.previewImgDialog = true;
-      this.imgUrl = file.url;
+      this.showImg = true
+      this.imgSrc = file.url
     },
-    // 上传类型限制
     beforeUpload(file) {
-      const types = ["image/jpeg", "image/gif"];
+      const types = ['image/jpeg', 'image/gif', 'image/png']
+      //   判断是否存在规则数组中
       if (!types.includes(file.type)) {
-        this.$message.error("请选择" + types.join("、") + "图片");
-        return false;
+        this.$message.error(`请选择${types.join('或')}格式的图片`)
+        return false
       }
-      console.log("上传前检查", file);
-      //   限制上传图片的大小
-      const maxSize = 2 * 1024 * 1024;
+      //   限制图片上传大小
+      const maxSize = 2 * 1024 * 1024
+
       if (file.size > maxSize) {
-        this.$message.error("选择的图片不能超出2mb");
-        return false;
+        this.$message.error(`上传图片不能大于2mb`)
+        return false
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <style lang="scss">
 .hide .el-upload--picture-card {
   display: none;
 }
-.custom-upload {
+.upCard {
   width: 148px;
   height: 148px;
   overflow: hidden;
