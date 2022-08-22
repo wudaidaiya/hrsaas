@@ -12,13 +12,8 @@ router.beforeEach(async (to, from, next) => {
     if (!store.state.user.userInfo.userId) {
       // 每次跳转发送获取用户信息的请求
       const { roles } = await store.dispatch('user/getUserInfo')
-      // console.log(roles.menus)
-      // console.log(asyncRoutes)
-      const routes = asyncRoutes.filter((item) =>
-        roles.menus.includes(item.meta.id)
-      )
-      // console.log(routes)
-      router.addRoutes([...routes,{ path: '*', redirect: '/404', hidden: true }])
+      await store.dispatch('permission/filterRoutes', roles)
+      await store.dispatch('permission/setPointsAction',roles.points)
       next(to.path)
     }
     // 登录了若想去登录页面---强制去首页

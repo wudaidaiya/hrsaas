@@ -9,9 +9,11 @@
           >
           <el-button type="info">复杂表头excel导出</el-button>
           <el-button type="success" @click="$router.push('/import')"
+           v-isHas='point.employees.import'
             >excel导入</el-button
           >
           <el-button type="primary" @click="showAddEmployees = true"
+          v-if='isHas(point.employees.import)'
             >新增员工</el-button
           >
         </template>
@@ -77,7 +79,8 @@
                 @click="showAssignRoleDialog(row)"
                 >角色</el-button
               >
-              <el-button type="text" size="small" @click="onRemove(row)">
+              <el-button type="text" size="small" @click="onRemove(row)"
+             v-if='isHas(point.employees.del)'>
                 删除
               </el-button>
             </template>
@@ -122,8 +125,10 @@ import employees from '@/constant/employees'
 import QRCode from 'qrcode'
 const { exportExcelMapPath, hireType } = employees
 import { delEmployee, getEmployeesInfoApi } from '@/api/employees'
+import MixinPermission from '@/mixins/permission'
 export default {
   name: 'Employees',
+  mixins:[MixinPermission],
   data() {
     return {
       params: {
@@ -135,7 +140,8 @@ export default {
       showAddEmployees: false,
       erCodeDialog: false,
       showDialog: false,
-      currentId: ''
+      currentId: '',
+
     }
   },
   components: {

@@ -8,6 +8,7 @@
             type="primary"
             size="small"
             @click="addDialogVisible = true"
+            v-if='isHas(point.roles.add)'
             >新增角色</el-button
           >
 
@@ -140,7 +141,9 @@ import {
 } from '@/api/setting'
 import { getPermissionList } from '@/api/permisson'
 import { transListToTree } from '@/utils/index'
+import MixinPermission from '@/mixins/permission'
 export default {
+  mixins:[MixinPermission],
   data() {
     return {
       activeName: 'first',
@@ -166,7 +169,7 @@ export default {
       treeList: [],
       checkedKeys: [],
       loading: false,
-      roleId: ''
+      roleId: '',
     }
   },
   methods: {},

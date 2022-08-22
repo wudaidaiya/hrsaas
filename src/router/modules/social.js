@@ -3,7 +3,7 @@ export default {
   path: '/social',
   component: Layout,
   meta: {
-    id: 'social_ssecuritys'
+    id: 'social_securitys'
   },
   children: [
     {
