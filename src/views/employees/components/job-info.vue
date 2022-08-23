@@ -1,19 +1,22 @@
 <template>
   <div>
-    <!-- 打印 -->
-    <i class="el-icon-printer" @click="$router.push('/employees/print?type=job')"></i>
+    <i
+      @click="$router.push('/employees/print?type=job')"
+      class="el-icon-printer"
+    ></i>
   </div>
 </template>
 
 <script>
 export default {
-  components: {},
   data() {
     return {}
   },
+
   created() {},
-  methods: {}
+
+  methods: {},
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="less"></style>

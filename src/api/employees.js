@@ -1,24 +1,24 @@
 import request from '@/utils/request'
 
 /**
- *  简单员工
- * @returns Promise
+ * 获取员工列表(简单)
+ * @returns promise
  */
-export function getEmployeesListApi() {
+export function getEmployeesApi() {
   return request({
-    url: '/sys/user/simple'
+    url: '/sys/user/simple',
   })
 }
 
 /**
- *  获取员工信息详情
- * @param {*} params
+ * 获取员工列表
+ * @param {*} params {page, size}
  * @returns
  */
 export function getEmployeesInfoApi(params) {
   return request({
     url: '/sys/user',
-    params
+    params,
   })
 }
 
@@ -29,7 +29,7 @@ export function getEmployeesInfoApi(params) {
 export function delEmployee(id) {
   return request({
     url: `/sys/user/${id}`,
-    method: 'delete'
+    method: 'delete',
   })
 }
 
@@ -40,32 +40,18 @@ export function addEmployee(data) {
   return request({
     method: 'post',
     url: '/sys/user',
-    data
+    data,
   })
 }
-
-/** *
- *  封装一个导入员工的接口
- *
- * ***/
-
-export function importEmployee(data) {
+/**
+ * 批量导入员工
+ * @param {*} data 员工数组
+ */
+export function importEmployees(data) {
   return request({
-    url: '/sys/user/batch',
     method: 'post',
-    data
-  })
-}
-
-/** *
- *
- * 保存员工的基本信息
- * **/
-export function saveUserDetailById(data) {
-  return request({
-    url: `/sys/user/${data.id}`,
-    method: 'put',
-    data
+    url: '/sys/user/batch',
+    data,
   })
 }
 
@@ -74,7 +60,7 @@ export function saveUserDetailById(data) {
  * **/
 export function getPersonalDetail(id) {
   return request({
-    url: `/employees/${id}/personalInfo`
+    url: `/employees/${id}/personalInfo`,
   })
 }
 
@@ -85,18 +71,7 @@ export function updatePersonal(data) {
   return request({
     url: `/employees/${data.userId}/personalInfo`,
     method: 'put',
-    data
-  })
-}
-
-/**
- * 保存岗位信息
- * ****/
-export function updateJob(data) {
-  return request({
-    url: `/employees/${data.userId}/jobs`,
-    method: 'put',
-    data
+    data,
   })
 }
 
@@ -107,6 +82,6 @@ export function assignRoles(data) {
   return request({
     url: '/sys/user/assignRoles',
     data,
-    method: 'put'
+    method: 'put',
   })
 }

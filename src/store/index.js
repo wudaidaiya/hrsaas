@@ -6,6 +6,7 @@ import settings from './modules/settings'
 import user from './modules/user'
 import permission from './modules/permission'
 import createVuexPersisted from 'vuex-persistedstate'
+import tagsView from "./modules/tagsView"
 
 Vue.use(Vuex)
 
@@ -14,21 +15,21 @@ const store = new Vuex.Store({
     app,
     settings,
     user,
-    permission
+    permission,
+    tagsView
   },
   getters,
   plugins: [
     createVuexPersisted({
       reducer(state) {
-        // 指定存储某个模块的数据
         return {
           user: {
-            token: state.user.token
-          }
+            token: state.user.token,
+          },
         }
-      }
-    })
-  ]
+      },
+    }),
+  ],
 })
 
 export default store

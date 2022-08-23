@@ -1,7 +1,7 @@
 <template>
-  <el-row type="flex" style="width: 100%">
+  <el-row style="width: 100%" type="flex">
     <el-col>{{ treeNode.name }}</el-col>
-    <el-col :span="4">
+    <el-col :span="5">
       <el-row type="flex">
         <el-col>{{ treeNode.manager }}</el-col>
         <el-col>
@@ -10,16 +10,14 @@
               操作<i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
-              <!-- 将数据传到父组件 -->
               <el-dropdown-item @click.native="$emit('add', treeNode)"
                 >添加部门</el-dropdown-item
               >
-              <!-- 头部公司不用 -->
               <template v-if="!isRoot">
-                <el-dropdown-item @click.native="$emit('edit',treeNode)"
+                <el-dropdown-item @click.native="$emit('edit', treeNode)"
                   >编辑部门</el-dropdown-item
                 >
-                <el-dropdown-item @click.native="removeBtn"
+                <el-dropdown-item @click.native="onRemove"
                   >删除部门</el-dropdown-item
                 >
               </template>
@@ -32,45 +30,41 @@
 </template>
 
 <script>
-import { delDeptsInfoApi } from '@/api/departments'
+import { delDeptsApi } from '@/api/departments'
 export default {
-  name: 'Tree',
-  components: {},
+  name: 'TreeTools',
   data() {
     return {}
   },
+
   props: {
     treeNode: {
       type: Object,
-      required: true
+      required: true,
     },
     isRoot: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
+
   created() {},
+
   methods: {
-    // 删除部门
-    async removeBtn() {
+    async onRemove() {
       try {
-        await this.$confirm('是否删除该部门?', '提示', {
+        await this.$confirm('此操作将永久删除该部门, 是否继续?', '提示', {
           confirmButtonText: '删除',
           cancelButtonText: '取消',
-          type: 'warning'
+          type: 'warning',
         })
-        await delDeptsInfoApi(this.treeNode.id)
-        this.$message({
-          message: '删除成功',
-          type: 'success'
-        })
-        // this.$parent.loadDepts()
-        this.$emit('delDepts')
-      } catch (error) {}
+        await delDeptsApi(this.treeNode.id)
+        this.$message.success('删除成功')
+        this.$emit('remove')
+      } catch (err) {}
     },
-
-  }
+  },
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="less"></style>

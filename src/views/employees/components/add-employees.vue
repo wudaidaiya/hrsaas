@@ -1,7 +1,6 @@
 <template>
-  <el-dialog title="新增员工" :visible="visible" width="50%" @close="onClose">
-    <!-- 表单 -->
-    <el-form :model="formData" :rules="rules" label-width="120px" ref="form">
+  <el-dialog @close="onClose" title="新增员工" :visible="visible" width="50%">
+    <el-form ref="form" :model="formData" :rules="rules" label-width="120px">
       <el-form-item label="姓名" prop="username">
         <el-input
           v-model="formData.username"
@@ -45,20 +44,23 @@
           placeholder="请输入工号"
         />
       </el-form-item>
-      <el-form-item label="部门">
-        <el-select
+      <el-form-item label="部门" prop="departmentName">
+        <!-- <el-input
           v-model="formData.departmentName"
           style="width: 50%"
-          placeholder="请选择"
+          placeholder="请选择部门"
+        /> -->
+        <el-select
           @focus="getDepts"
-          ref="treeNode"
+          v-model="formData.departmentName"
+          placeholder="请选择部门"
+          ref="deptSelect"
         >
-          <el-option value="" v-loading="isTreeLoading" class="treeOption">
+          <el-option class="treeOption" v-loading="isTreeLoading" value="">
             <el-tree
-              :data="data"
-              default-expand-all
-              :props="treeProps"
               @node-click="treeNodeClick"
+              :data="depts"
+              :props="treeProps"
             ></el-tree>
           </el-option>
         </el-select>
@@ -71,28 +73,20 @@
         />
       </el-form-item>
     </el-form>
-    <!-- footer插槽 -->
-    <template v-slot:footer>
-      <el-row type="flex" justify="center">
-        <el-col :span="6">
-          <el-button size="small" @click="onClose">取消</el-button>
-          <el-button type="primary" size="small" @click="onSave"
-            >确定</el-button
-          >
-        </el-col>
-      </el-row>
-    </template>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="onClose">取 消</el-button>
+      <el-button @click="onSave" type="primary">确 定</el-button>
+    </span>
   </el-dialog>
 </template>
 
 <script>
-import EmployeeEnum from '@/constant/employees'
+import employees from '@/constant/employees'
 import { getDeptsApi } from '@/api/departments'
-import { transListToTree } from '@/utils/index'
+import { transListToTree } from '@/utils'
 import { addEmployee } from '@/api/employees'
-const { hireType } = EmployeeEnum
+const { hireType } = employees
 export default {
-  components: {},
   data() {
     return {
       formData: {
@@ -102,7 +96,7 @@ export default {
         workNumber: '',
         departmentName: '',
         timeOfEntry: '',
-        correctionTime: ''
+        correctionTime: '',
       },
       rules: {
         username: [
@@ -110,87 +104,86 @@ export default {
           {
             min: 1,
             max: 4,
-            message: '用户姓名为1-4位'
-          }
+            message: '用户姓名为1-4位',
+          },
         ],
         mobile: [
           { required: true, message: '手机号不能为空', trigger: 'blur' },
           {
             pattern: /^1[3-9]\d{9}$/,
             message: '手机号格式不正确',
-            trigger: 'blur'
-          }
+            trigger: 'blur',
+          },
         ],
         formOfEmployment: [
-          { required: true, message: '聘用形式不能为空', trigger: 'change' }
+          { required: true, message: '聘用形式不能为空', trigger: 'change' },
         ],
         workNumber: [
-          { required: true, message: '工号不能为空', trigger: 'blur' }
+          { required: true, message: '工号不能为空', trigger: 'blur' },
         ],
         departmentName: [
-          { required: true, message: '部门不能为空', trigger: 'change' }
+          { required: true, message: '部门不能为空', trigger: 'blur' },
         ],
-        timeOfEntry: [{ required: true, message: '入职时间', trigger: 'blur' }]
+        timeOfEntry: [
+          { required: true, message: '入职时间', trigger: 'change' },
+        ],
       },
       hireType,
-      data: [],
+      depts: [],
       treeProps: {
-        label: 'name'
+        label: 'name',
       },
-      isTreeLoading: false
+      isTreeLoading: false,
     }
   },
+
   props: {
     visible: {
       type: Boolean,
-      default: false
-    }
+      required: true,
+    },
   },
+
   created() {},
+
   methods: {
-    // 关闭弹框
     onClose() {
       this.$emit('update:visible', false)
       this.$refs.form.resetFields()
     },
-    // 获取新增部门的树状数据
     async getDepts() {
-      // 进入加载
       this.isTreeLoading = true
-      // 发起请求
       const { depts } = await getDeptsApi()
-      // 处理数据变成树桩数据
       transListToTree(depts, '')
-      this.data = depts
+      this.depts = depts
       this.isTreeLoading = false
     },
-    // 点击树状图
-    treeNodeClick(val) {
-      this.formData.departmentName = val.name
-      this.$refs.treeNode.blur()
+    treeNodeClick(row) {
+      // console.log(row)
+      this.formData.departmentName = row.name
+      this.$refs.deptSelect.blur()
     },
-    // 点击确定
-    async onSave() {
-      // 点击确认的时候进行表单校验
-      await this.$refs.form.validate()
-      try {
+    onSave() {
+      this.$refs.form.validate(async (valid) => {
+        if (!valid) return
         await addEmployee(this.formData)
         this.$message.success('添加成功')
         this.onClose()
-        this.$parent.getEmployeesInfo()
-      } catch (error) {}
-    }
-  }
+        this.$emit('add-success')
+      })
+    },
+  },
 }
 </script>
 
 <style scoped lang="scss">
 .el-select-dropdown__item.hover,
-.el-select-dropdown__item:hover {
+.el-select-dropdown__item:hover .el-select-dropdown__item {
   background-color: #fff;
   overflow: unset;
 }
+
 .treeOption {
-  height: 200px;
+  height: 100px;
 }
 </style>
